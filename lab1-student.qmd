@@ -1,56 +1,59 @@
 ---
 title: "Lab 1: Introduction to Quarto"
 author: "Christopher Hawkins"
-date: "26SEP24"
-format: html
+date: "09/26/24"
 editor: source
-embed-resources: true
+format: 
+  html:
+    toc: true
+    toc-depth: 2
+    toc-expand: true
+    number-sections: true
+    number-depth: 2
 execute:
-  echo: false
+    echo: true
+    error: true
+code-fold: true
+theme: minty
 ---
 
 # Part Two: Exploring Quarto Documents
 
 ## Specifying Global Execute Options
 
-Execution options specify how the R code in your Quarto document should be
-displayed. This [guide](https://quarto.org/docs/computations/execution-options.html)
-provides descriptions on the options you can specify in a document's execution.
+Execution options specify how the R code in your Quarto document should be displayed. This [guide](https://quarto.org/docs/computations/execution-options.html) provides descriptions on the options you can specify in a document's execution.
 
-**Question 1** -- Add your name and the date to the YAML. 
+**Question 1** -- Add your name and the date to the YAML.
 
-**Question 2** -- Add an `execute` line to your YAML that includes the following
-options, (1) your source code is always output on the page, and (2) your
-document will render even if there are errors.
+**Question 2** -- Add an `execute` line to your YAML that includes the following options, (1) your source code is always output on the page, and (2) your document will render even if there are errors.
 
-## Running the Provided Code
+## Tooth Growth Dataset
 
 ```{r}
 #| eval: false
 #| echo: true
 #| label: practicing-running-code
 
-1 + 1
+# Load a dataset into the R Environment.
+data(ToothGrowth)
+
+# Look at the summary of the variables in the dataset.
+summary(ToothGrowth)
 ```
 
-**Question 3** -- Let's spice this code up a bit. Delete `1 + 1` from the code
-chunk and paste in the code provided in the Lab 1 instructions. 
+**Question 3** -- Let's spice this code up a bit. Delete `1 + 1` from the code chunk and paste in the code provided in the Lab 1 instructions.
 
 ### Check the Data Documentation
 
-**Question 4** -- In your **console** (*not* in the Quarto document), type
-`?ToothGrowth` (or alternatively `help(ToothGrowth)`.Use the information that
-pops up in the *Help* pane in RStudio to fill in the blanks below. 
+**Question 4** -- In your **console** (*not* in the Quarto document), type `?ToothGrowth` (or alternatively `help(ToothGrowth)`.Use the information that pops up in the *Help* pane in RStudio to fill in the blanks below.
 
-*This dataset investigates the effect of _____ on tooth growth in ____.*
+*This dataset investigates the effect of Vitamin C on tooth growth in Guinea Pigs.*
 
-*The two supplement delivery methods include OJ (____) and VC (____).*
+*The two supplement delivery methods include OJ (orange juice) and VC (ascorbic acid).*
 
-*`ToothGrowth` is a data frame with ___observations and ____ variables.*
+*`ToothGrowth` is a data frame with 60 observations and 3 variables.*
 
-**Question 5** -- *Before* the code chunk, change the "Running the Provided
-Code" section header to a header that better describes the contents of this
-section (e.g., Tooth Growth Dataset).
+**Question 5** -- *Before* the code chunk, change the "Running the Provided Code" section header to a header that better describes the contents of this section (e.g., Tooth Growth Dataset).
 
 ## Creating a Plot
 
@@ -59,21 +62,79 @@ section (e.g., Tooth Growth Dataset).
 ```{r}
 #| echo: true
 #| label: creating-a-plot
+#| layout-ncol: 2
+#| fig-align: "center"
+#| fig-cap:
+#| - "Tooth Length vs Delivery Method."
+#| - "Tooth Length vs Dosage Amount."
 
-plot(pressure)
+library(tidyverse)
+
+ggplot(data = ToothGrowth, 
+       mapping = aes(x = supp, y = len)) +
+  geom_boxplot() +
+  labs(x = "Supplement", y = "Length of Teeth (mm)")
+
+ToothGrowth %>% 
+  mutate(dose = as.factor(dose)) %>% 
+  ggplot(mapping = aes(x = dose, y = len)) +
+  geom_boxplot() +
+  labs(x = "Dose of Supplement (mg/day)", y = "Length of Teeth (mm)")
 ```
 
-Now, run this code chunk! You should see two side-by-side boxplots, one plot
-comparing tooth length between the two supplement delivery methods and one plot
-comparing tooth length between the three different dosages uses. 
+Now, run this code chunk! You should see two side-by-side boxplots, one plot comparing tooth length between the two supplement delivery methods and one plot comparing tooth length between the three different dosages uses.
 
-**Question 7** -- Read over the [Quarto documentation on figure options](https://quarto.org/docs/authoring/figures.html#computations)
-and add an option (`#|`) to the above code chunk to make the figures print
-side-by-side (i.e., in one row) in the rendered HTML file. 
+**Question 7** -- Read over the [Quarto documentation on figure options](https://quarto.org/docs/authoring/figures.html#computations) and add an option (`#|`) to the above code chunk to make the figures print side-by-side (i.e., in one row) in the rendered HTML file.
 
-**Question 8** -- Specify in the code chunk options that these boxplots 
-should be **center aligned**.
+**Question 8** -- Specify in the code chunk options that these boxplots should be **center aligned**.
 
-**Question 9** -- Specify a **figure caption** for the boxplots (using a
-code-chunk option).
+**Question 9** -- Specify a **figure caption** for the boxplots (using a code-chunk option).
 
+## Performing a t-test
+
+Perform a two-sided independent t-test to compare the resultant tooth length between the two supplement methods.
+
+**Question 10** -– Using the t.test() function, write code to carry out the analysis. You can assume unequal variances and a two-sided alternative.
+
+**Question 11** -– Run your code chunk to obtain the output for your statistical test.
+
+**Question 12** -– Create a numbered list containing:
+
+Your conclusion (in the context of these data) based on the p-value.
+
+An interpretation of the confidence interval (make sure to read what confidence level is used by default).
+
+```{r}
+#| eval: true
+#| echo: true
+#| label: Performing a t-test
+
+# Create a variable to hold supplement 1 data
+VC <- ToothGrowth[1:30,1]
+# Create a variable to hold supplement 2 data
+OJ <- ToothGrowth[31:60,1]
+
+# Assume unequal variances
+# Assume two-sided alternative
+testResults <- t.test(x = VC, y = OJ, alternative = "two.sided", var.equal = FALSE)
+
+# Display the test results
+print(testResults)
+
+# Create a list containing the conclusion based on the p-value and an interpretation of the confidence interval.
+
+# conclusion based on p-value:
+
+p_value <- sprintf("Fail to reject null hypothesis, since p-value = %0.2f ≥ \u03B1 = 0.05.", testResults$p.value)
+# reference: https://www.rdocumentation.org/packages/base/versions/3.6.2/topics/sprintf
+# reference: https://stackoverflow.com/questions/60219962/is-it-possible-to-use-greek-letters-in-r-in-strings
+
+# conclusion based on confidence interval:
+
+confidence <- sprintf("The difference in means of VC and OJ is between %0.2f and %0.2f with a confidence level of %0.2f.", testResults$conf.int[1], testResults$conf.int[2], attr(testResults$conf.int, "conf.level"))
+
+result_list <- list(p_value, confidence)
+
+# print the list
+print(result_list)
+```
