@@ -15,6 +15,8 @@ execute:
     error: true
 code-fold: true
 theme: minty
+warning: false
+message: false
 ---
 
 # Part Two: Exploring Quarto Documents
