@@ -17,6 +17,7 @@ code-fold: true
 theme: minty
 warning: false
 message: false
+embed-resources: true
 ---
 
 # Part Two: Exploring Quarto Documents
